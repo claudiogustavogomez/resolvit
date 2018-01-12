@@ -1,0 +1,227 @@
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.codehaus.jackson.JsonEncoding;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.tartarus.snowball.ext.PorterStemmer;
+
+
+
+public class ResolvitText {
+
+	public static void main(String[] args) {
+		HashSet<String> hashByLine=new HashSet<String>();  
+        List<String> wordCount1 = new ArrayList<String>();
+        List<String> wordCount2 = new ArrayList<String>();
+        List<String> wordCount3 = new ArrayList<String>();
+        List<String> wordCount4 = new ArrayList<String>();
+        List<String> wordCount5 = new ArrayList<String>();
+        List<String> wordCount6 = new ArrayList<String>();        
+
+
+        PorterStemmer stemmer = new PorterStemmer();
+        String strings1[] = new String[] {"Take this paragraph of text and return an alphabetized list of ALL unique words.  A unique word is any form of a "};
+        String strings2[] = new String[] {"word often communicated with essentially the same meaning. For example, fish and fishes could be defined as a "};
+        String strings3[] = new String[] {"unique word by using their stem fish. For each unique word found in this entire paragraph, determine the how "};
+        String strings4[] = new String[] {"total. Also, provide an analysis of what unique sentence index position or positions the word is found. The following word"};
+        String strings5[] = new String[] {"should not be included in your analysis or result set: a, the, and, of, in, be, also and as.  Your final result MUST"};        
+        String strings6[] = new String[] {"be displayed in a readable console output in the same format as the JSON sample object shown below"};
+        
+        
+        processLine1(strings1, stemmer, wordCount1);
+        processLine2(strings2, stemmer, wordCount2);
+        processLine3(strings3, stemmer, wordCount3);
+        processLine4(strings4, stemmer, wordCount4);
+        processLine5(strings5, stemmer, wordCount5);
+        processLine6(strings6, stemmer, wordCount6);        
+        wordCount1.addAll(wordCount2);
+        wordCount1.addAll(wordCount3);
+        wordCount1.addAll(wordCount4);
+        wordCount1.addAll(wordCount5);
+        wordCount1.addAll(wordCount6);
+        
+        countMatchesByWord(wordCount1);
+        
+        countMatchesByLine(wordCount1, wordCount2, wordCount3, wordCount4, wordCount5, wordCount6, hashByLine);
+	}
+	
+	private static List<String> processLine1(String[] strings1, PorterStemmer stemmer, List<String> wordCount1) {
+        for (String s : strings1) {
+            for (String word : s.split("[\\s\\.]+")) {
+            	if (chkWord(word)){
+                    stemmer.setCurrent(word);
+                    stemmer.stem();
+                    wordCount1.add(stemmer.getCurrent());            		
+            	}
+            }
+        }
+        return wordCount1;
+	}
+	
+	private static List<String> processLine2(String[] strings2, PorterStemmer stemmer, List<String> wordCount2) {
+        for (String s : strings2) {
+            for (String word : s.split("[\\s\\.]+")) {
+            	if (chkWord(word)){
+                    stemmer.setCurrent(word);
+                    stemmer.stem();
+                    wordCount2.add(stemmer.getCurrent());            		
+            	}
+             }
+        }
+        return wordCount2;
+	}	
+
+	private static List<String> processLine3(String[] strings3, PorterStemmer stemmer, List<String> wordCount3) {
+        for (String s : strings3) {
+            for (String word : s.split("[\\s\\.]+")) {
+            	if (chkWord(word)){
+                    stemmer.setCurrent(word);
+                    stemmer.stem();
+                    wordCount3.add(stemmer.getCurrent());            		
+            	}
+             }
+        }
+        return wordCount3;	
+	}	
+	
+	private static List<String> processLine4(String[] strings4, PorterStemmer stemmer, List<String> wordCount4) {
+        for (String s : strings4) {
+            for (String word : s.split("[\\s\\.]+")) {
+            	if (chkWord(word)){
+                    stemmer.setCurrent(word);
+                    stemmer.stem();
+                    wordCount4.add(stemmer.getCurrent());            		
+            	}
+            }
+        }
+        return wordCount4;
+	}	
+	
+	private static List<String> processLine5(String[] strings5, PorterStemmer stemmer, List<String> wordCount5) {
+        for (String s : strings5) {
+            for (String word : s.split("[\\s\\.]+")) {
+            	if (chkWord(word)){
+                    stemmer.setCurrent(word);
+                    stemmer.stem();
+                    wordCount5.add(stemmer.getCurrent());            		
+            	}
+            }
+        }
+        return wordCount5;
+	}	
+	
+	private static List<String> processLine6(String[] strings6, PorterStemmer stemmer, List<String> wordCount6) {
+        for (String s : strings6) {
+            for (String word : s.split("[\\s\\.]+")) {
+            	if (chkWord(word)){
+                    stemmer.setCurrent(word);
+                    stemmer.stem();
+                    wordCount6.add(stemmer.getCurrent());            		
+            	}
+            }
+        }
+        return wordCount6;
+	}	
+	
+	
+	private static void countMatchesByWord(List<String> lista) {
+		System.out.println("entro ok");
+		int cont;
+		for (int x=0; x<lista.size()-1;x++) {
+			cont=0;
+			for (int y=1; y<lista.size(); y++) {
+				if (lista.get(x).equals(lista.get(y))) {
+					cont++;
+				}
+			}
+			System.out.println("muestra "+lista.get(x).toString());
+			showWordCount(lista.get(x).toString(), cont);
+		}
+	}
+	
+	private static void showWordCount(String word, int con) {
+		System.out.println("Word: "+word);
+		System.out.println("total-occurrences: "+con);
+		System.out.println("-----------------");
+	}
+	
+	private static void countMatchesByLine(List<String> lista1, List<String> lista2, List<String> lista3, List<String> lista4, List<String> lista5, List<String> lista6, HashSet<String> hashByLine) {
+		StringBuffer wordMatch = new StringBuffer();
+		for (int x1=1; x1<lista1.size();x1++) {
+			wordMatch.append("1");
+			if (chkWord(lista1.get(x1))) {
+				for(int x2=1;x2<lista2.size();x2++) {
+					if (lista1.get(x1).equals(lista2.get(x2))) {
+						wordMatch.append(",2");
+					}
+				}
+				for(int x3=1;x3<lista3.size();x3++) {
+					if (lista1.get(x1).equals(lista3.get(x3))) {
+						wordMatch.append(",3");
+					}
+				}
+				for(int x4=1;x4<lista4.size();x4++) {
+					if (lista1.get(x1).equals(lista4.get(x4))) {
+						wordMatch.append(",4");
+					}
+				}				
+				for(int x5=1;x5<lista5.size();x5++) {
+					if (lista1.get(x1).equals(lista5.get(x5))) {
+						wordMatch.append(",5");
+					}
+				}	
+				for(int x6=1;x6<lista6.size();x6++) {
+					if (lista1.get(x1).equals(lista6.get(x6))) {
+						wordMatch.append(",6");
+					}
+				}				
+			}
+			showSentenceIndex(lista1.get(x1).toString(), wordMatch, hashByLine);			
+			wordMatch.delete(0, 100);
+		}
+	}
+	
+	private static void showSentenceIndex(String word, StringBuffer wordMatch, HashSet<String> hashByLine) {
+		hashByLine.add(word+" "+wordMatch);
+		Iterator<String> itr = hashByLine.iterator();
+        while (itr.hasNext()) {
+            System.out.println("sentence-indexes: "+itr.next());
+        }		
+	}
+	
+	private static boolean chkWord(String car) {
+		switch(car){
+		case "a":
+			return false;
+		case "the":
+			return false;			
+		case "and":
+			return false;			
+		case "of":
+			return false;			
+		case "in":
+			return false;			
+		case "be":
+			return false;			
+		case "also":
+			return false;			
+		case "as":
+			return false;	
+		default:
+			return true;
+		}
+			
+	}
+	
+
+}

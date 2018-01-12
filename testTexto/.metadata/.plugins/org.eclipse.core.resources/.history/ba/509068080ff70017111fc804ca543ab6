@@ -1,0 +1,183 @@
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.codehaus.jackson.JsonEncoding;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.tartarus.snowball.ext.PorterStemmer;
+
+
+
+public class ResolvitText {
+
+	public static void main(String[] args) {
+		HashSet<String> hashByLine=new HashSet<String>();  
+        List<String> wordCount1 = new ArrayList<String>();
+        List<String> wordCount2 = new ArrayList<String>();
+        List<String> wordCount3 = new ArrayList<String>();
+
+
+        PorterStemmer stemmer = new PorterStemmer();
+        String strings1[] = new String[] {"Take this paragraph of text and return an alphabetized list of ALL unique words.  A unique word is any form of a "};
+        String strings2[] = new String[] {"word often communicated with essentially the same meaning. For example, fish and fishes could be defined as a "};
+        String strings3[] = new String[] {"unique word by using their stem fish. For each unique word found in this entire paragraph, determine the how "};
+        
+        
+        processLine1(strings1, stemmer, wordCount1);
+        processLine2(strings2, stemmer, wordCount2);
+        processLine3(strings3, stemmer, wordCount3);
+        wordCount1.addAll(wordCount2);
+        wordCount1.addAll(wordCount3);
+        
+        countMatchesByWord(wordCount1);
+        
+        countMatchesByLine(wordCount1, wordCount2, wordCount3, hashByLine);
+	}
+	
+	private static List<String> processLine1(String[] strings1, PorterStemmer stemmer, List<String> wordCount1) {
+        for (String s : strings1) {
+            for (String word : s.split("[\\s\\.]+")) {
+            	if (chkWord(word)){
+                    stemmer.setCurrent(word);
+                    stemmer.stem();
+                    wordCount1.add(stemmer.getCurrent());            		
+            	}
+            }
+        }
+        return wordCount1;
+	}
+	
+	private static List<String> processLine2(String[] strings2, PorterStemmer stemmer, List<String> wordCount2) {
+        for (String s : strings2) {
+            for (String word : s.split("[\\s\\.]+")) {
+            	if (chkWord(word)){
+                    stemmer.setCurrent(word);
+                    stemmer.stem();
+                    wordCount2.add(stemmer.getCurrent());            		
+            	}
+             }
+        }
+        return wordCount2;
+	}	
+
+	private static List<String> processLine3(String[] strings3, PorterStemmer stemmer, List<String> wordCount3) {
+        for (String s : strings3) {
+            for (String word : s.split("[\\s\\.]+")) {
+            	if (chkWord(word)){
+                    stemmer.setCurrent(word);
+                    stemmer.stem();
+                    wordCount3.add(stemmer.getCurrent());            		
+            	}
+             }
+        }
+        return wordCount3;	
+	}	
+	
+	
+	private static int countMatchesByWord(List<String> lista) {
+		int cont;
+		for (int x=0; x<lista.size()-1;x++) {
+			cont=0;
+			for (int y=1; y<lista.size(); y++) {
+				if (lista.get(x).equals(lista.get(y))) {
+					cont++;
+				}
+			}
+			showWordCount(lista.get(x).toString(), cont);
+		}
+		return 1;
+	}
+	
+	private static void showWordCount(String word, int con) {
+		JsonFactory jfactory = new JsonFactory();
+		try {
+			JsonGenerator jGenerator = jfactory.createJsonGenerator(new File(
+					"c:\\Temp\\user.json"), JsonEncoding.UTF8);		
+			jGenerator.writeStartObject();
+			jGenerator.writeStringField("word", word); 
+			jGenerator.writeNumberField("total-occurrences", con);
+			
+			jGenerator.writeEndObject();
+			jGenerator.close();
+		
+			
+		} catch (JsonGenerationException e) {
+				e.printStackTrace();
+		     } catch (JsonMappingException e) {
+		    	e.printStackTrace();
+		     } catch (IOException e) {
+		    	e.printStackTrace();
+		     }
+	}
+	
+	private static void countMatchesByLine(List<String> lista1, List<String> lista2, List<String> lista3, HashSet<String> hashByLine) {
+		StringBuffer wordMatch = new StringBuffer();
+		for (int x1=1; x1<lista1.size();x1++) {
+			wordMatch.append("1");
+			if (chkWord(lista1.get(x1))) {
+				for(int x2=1;x2<lista2.size();x2++) {
+					if (lista1.get(x1).equals(lista2.get(x2))) {
+						wordMatch.append(",2");
+					}
+				}
+				for(int x3=1;x3<lista3.size();x3++) {
+					if (lista1.get(x1).equals(lista3.get(x3))) {
+						wordMatch.append(",3");
+					}
+				}
+			}
+			showSentenceIndex(lista1.get(x1).toString(), wordMatch, hashByLine);			
+			wordMatch.delete(0, 100);
+		}
+	}
+	
+	private static void showSentenceIndex(String word, StringBuffer wordMatch, HashSet<String> hashByLine) {
+		hashByLine.add(word+"-"+wordMatch);
+		
+		
+		System.out.println(word+"-"+wordMatch);
+	}
+	
+	private static boolean chkWord(String car) {
+		switch(car){
+		case "a":
+			return false;
+		case "the":
+			return false;			
+		case "and":
+			return false;			
+		case "of":
+			return false;			
+		case "in":
+			return false;			
+		case "be":
+			return false;			
+		case "also":
+			return false;			
+		case "as":
+			return false;	
+		default:
+			return true;
+		}
+			
+	}
+	
+//	  public static String toPrettyFormat(String jsonString) {
+//	      JsonParser parser = new JsonParser();
+//	      JsonObject json = parser.parse(jsonString).getAsJsonObject();
+//
+//	      Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//	      String prettyJson = gson.toJson(json);
+//
+//	      return prettyJson;
+//	  }	
+
+}
